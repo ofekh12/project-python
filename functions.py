@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from jsonschema import validate, ValidationError
+from src.machine import Machine
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s', force=True)
 
@@ -43,16 +44,10 @@ def vm_input():
         except ValueError:
             logging.error("CPU and RAM must be valid numbers.")
             continue
+        machine = Machine(name, os_type, cpu, ram)
 
-        instance = {
-            "name": name,
-            "os": os_type,
-            "cpu": cpu,
-            "ram": ram
-        }
-
-        if validate_vm_data(instance):
-            vm_list.append(instance)
+        if validate_vm_data(machine.to_dict()):
+            vm_list.append(machine.to_dict())
             logging.info("Machine added successfully.")
         else:
             logging.warning("Machine not added due to validation error.")

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import subprocess
 from jsonschema import validate, ValidationError
 from src.machine import Machine
 
@@ -44,9 +45,17 @@ def vm_input():
         except ValueError:
             logging.error("CPU and RAM must be valid numbers.")
             continue
-        machine = Machine(name, os_type, cpu, ram)
 
-        if validate_vm_data(machine.to_dict()):
+        machine_data = {
+            "name": name,
+            "os": os_type,
+            "cpu": cpu,
+            "ram": ram
+        }
+
+        if validate_vm_data(machine_data):
+            # רק אם תקין יוצרים את האובייקט
+            machine = Machine(**machine_data)
             vm_list.append(machine.to_dict())
             logging.info("Machine added successfully.")
         else:
@@ -61,3 +70,16 @@ instances = vm_input()
 os.chdir(os.path.dirname(__file__))
 with open("configs/instances.json", "w") as file:
     json.dump(instances, file, indent=4)
+
+base_dir = os.path.dirname(os.path.abspath(__file__))  # זה יביא את הנתיב של הקובץ הנוכחי
+script_path = os.path.join(base_dir, "scripts", "install.sh")
+
+def run_script():
+    try:
+        subprocess.run(["bash", script_path],check=True)
+        logging.info("server installation completed.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f" Failed to install server: {e}")
+
+if __name__ == "__main__":
+    run_script()

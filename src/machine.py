@@ -1,6 +1,5 @@
 import logging
-
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', force=True)
+logger = logging.getLogger(__name__)
 
 class Machine:
     def __init__(self, name, os, cpu, ram):
@@ -8,7 +7,7 @@ class Machine:
         self.os = os
         self.cpu = cpu
         self.ram = ram
-        logging.info(f"Machine created: '{self.name}'")
+        logger.info(f"Machine created: '{self.name}'")
 
     def to_dict(self):
         return {
